@@ -1,0 +1,47 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model drugs {
+  id     Int    @id @default(autoincrement())
+  name   String @db.VarChar(255)
+  price  Float
+  count  Int
+  store  Int    @default(0)
+  image  Bytes  @db.MediumBlob
+  stores stores @relation(fields: [store], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "drugs_ibfk_1")
+
+  @@index([store], map: "store")
+}
+
+model order_items {
+  id          Int         @id @default(autoincrement())
+  order_id    Int
+  drug_id     Int
+  count       Int
+  orders_list orders_list @relation(fields: [order_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "order_items_ibfk_1")
+
+  @@index([order_id], map: "order_id")
+}
+
+model orders_list {
+  id          Int           @id @default(autoincrement())
+  name        String        @db.VarChar(255)
+  email       String        @db.VarChar(255)
+  phone       String        @db.VarChar(255)
+  address     String        @db.VarChar(255)
+  time_create DateTime      @default(now()) @db.DateTime(0)
+  order_items order_items[]
+}
+
+model stores {
+  id      Int     @id @default(autoincrement())
+  name    String  @db.VarChar(255)
+  address String  @db.VarChar(255)
+  drugs   drugs[]
+}
